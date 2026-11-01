@@ -22,7 +22,7 @@ DATE         := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 LDFLAGS       = -s -w -X main.version=$(BUILD_VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE)
 
 REMOTE ?= origin
-BRANCH ?= main
+BRANCH ?= master
 
 PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
 
