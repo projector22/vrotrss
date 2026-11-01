@@ -102,11 +102,24 @@ backend for `-demo` and tests).
 ### Releasing
 
 ```sh
-make tag VERSION=v0.1.0      # clean tree + vet/lint/tests, then creates an annotated tag
-git push origin v0.1.0       # GitHub Actions does the rest
+make tag-patch    # v0.1.0 -> v0.1.1   (bug fixes)
+make tag-minor    # v0.1.1 -> v0.2.0   (new features)
+make tag-major    # v0.2.0 -> v1.0.0   (breaking changes)
+make tag VERSION=v1.4.2   # or choose the version yourself
 ```
 
-Pushing a `vX.Y.Z` (or `vX.Y.Z-rc.1`) tag triggers `.github/workflows/release.yml`,
+Each target works out the next version from the latest `vX.Y.Z` tag (pre-releases such as
+`-rc.1` are ignored; with no tags it starts from `v0.0.0`), then:
+
+1. checks the tree is clean, you are on `main`, and `HEAD` matches `origin/main`;
+2. runs `go vet`, golangci-lint and `go test -race`;
+3. asks for confirmation (skipped with `YES=1` or when not run from a terminal);
+4. creates an annotated tag and **pushes it**. If the push fails the local tag is removed.
+
+Add `DRY_RUN=1` to preview the version and run the guards without running checks, tagging or
+pushing. `BRANCH=` and `REMOTE=` override `main` and `origin`.
+
+The pushed `vX.Y.Z` (or `vX.Y.Z-rc.1`) tag triggers `.github/workflows/release.yml`,
 which runs the full CI suite, cross-builds archives for linux/darwin (amd64, arm64) and
 windows (amd64) with `SHA256SUMS`, smoke-tests the linux binary's reported version, and
 publishes a GitHub release with generated notes (tags containing `-` are marked
