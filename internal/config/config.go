@@ -73,9 +73,9 @@ var runCommand = func(ctx context.Context, command string) (string, error) {
 	var cmd *exec.Cmd
 	// The command comes from the user's own config file, so running it is intended.
 	if runtime.GOOS == "windows" {
-		cmd = exec.CommandContext(ctx, "cmd", "/C", command)
+		cmd = exec.CommandContext(ctx, "cmd", "/C", command) //nolint:gosec // password_cmd is the user's own config
 	} else {
-		cmd = exec.CommandContext(ctx, "sh", "-c", command)
+		cmd = exec.CommandContext(ctx, "sh", "-c", command) //nolint:gosec // password_cmd is the user's own config
 	}
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()

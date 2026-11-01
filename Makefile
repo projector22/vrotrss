@@ -9,7 +9,7 @@ DIST     := dist
 GOBIN    := $(shell go env GOPATH)/bin
 
 # Pinned tool versions (override on the command line if needed).
-GOLANGCI_LINT_VERSION ?= v2.1.6
+GOLANGCI_LINT_VERSION ?= v2.15.0
 GOVULNCHECK_VERSION   ?= latest
 
 # ---- versioning ------------------------------------------------------------
@@ -20,6 +20,9 @@ BUILD_VERSION = $(or $(VERSION),$(GIT_VERSION))
 COMMIT       := $(shell git rev-parse --short HEAD 2>/dev/null || echo none)
 DATE         := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 LDFLAGS       = -s -w -X main.version=$(BUILD_VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE)
+
+REMOTE ?= origin
+BRANCH ?= main
 
 PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
 
@@ -154,13 +157,58 @@ _require-clean:
 	@git diff --quiet && git diff --cached --quiet || { echo "Working tree has uncommitted changes; commit or stash first."; exit 1; }
 	@test -z "$$(git ls-files --others --exclude-standard)" || { echo "Untracked files present; commit or ignore them first."; exit 1; }
 
+.PHONY: _require-branch
+_require-branch:
+	@br=$$(git rev-parse --abbrev-ref HEAD); [ "$$br" = "$(BRANCH)" ] || { \
+		echo "On branch '$$br'; releases are tagged from '$(BRANCH)' (override with BRANCH=...)."; exit 1; }
+	@git fetch --quiet $(REMOTE) || { echo "Cannot reach remote '$(REMOTE)'."; exit 1; }
+	@[ "$$(git rev-parse HEAD)" = "$$(git rev-parse $(REMOTE)/$(BRANCH))" ] || { \
+		echo "HEAD differs from $(REMOTE)/$(BRANCH): pull or push your commits first."; exit 1; }
+
 .PHONY: tag
-tag: _require-version _require-clean check ## Create an annotated git tag: make tag VERSION=v0.1.0
+tag: _require-version _require-clean _require-branch ## Tag an explicit version and push it: make tag VERSION=v0.1.0 [DRY_RUN=1] [YES=1]
 	@if git rev-parse -q --verify "refs/tags/$(VERSION)" >/dev/null; then \
-		echo "Tag $(VERSION) already exists."; exit 1; fi
-	git tag -a $(VERSION) -m "Release $(VERSION)"
-	@echo "Created tag $(VERSION) on $$(git rev-parse --short HEAD)."
-	@echo "Publish it with: make release VERSION=$(VERSION)"
+		echo "Tag $(VERSION) already exists locally."; exit 1; fi
+	@if git ls-remote --exit-code --tags $(REMOTE) "refs/tags/$(VERSION)" >/dev/null 2>&1; then \
+		echo "Tag $(VERSION) already exists on $(REMOTE)."; exit 1; fi
+	@if [ -n "$(DRY_RUN)" ]; then \
+		echo "[dry-run] would run checks, tag $$(git rev-parse --short HEAD) as $(VERSION) and push to $(REMOTE)."; exit 0; fi; \
+	$(MAKE) --no-print-directory check || exit 1; \
+	if [ -z "$(YES)" ] && [ -t 0 ]; then \
+		read -r -p "Tag $$(git rev-parse --short HEAD) as $(VERSION) and push to $(REMOTE)? This publishes a release. [y/N] " ans; \
+		[ "$$ans" = y ] || [ "$$ans" = Y ] || { echo "Aborted."; exit 1; }; \
+	fi; \
+	git tag -a $(VERSION) -m "Release $(VERSION)" || exit 1; \
+	git push $(REMOTE) $(VERSION) || { git tag -d $(VERSION) >/dev/null; echo "Push failed; local tag removed."; exit 1; }; \
+	echo "Pushed $(VERSION) to $(REMOTE): GitHub Actions will test, build and publish the release."
+
+.PHONY: _bump
+_bump: _require-clean
+	@test -n "$(BUMP)"
+	@git fetch --quiet --tags $(REMOTE) || { echo "Cannot reach remote '$(REMOTE)'."; exit 1; }
+	@latest=$$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | grep -Ev -- '-' | head -n1); \
+	latest=$${latest:-v0.0.0}; \
+	IFS=. read -r maj min pat <<<"$${latest#v}"; \
+	case "$(BUMP)" in \
+		major) maj=$$((maj+1)); min=0; pat=0 ;; \
+		minor) min=$$((min+1)); pat=0 ;; \
+		patch) pat=$$((pat+1)) ;; \
+	esac; \
+	next="v$$maj.$$min.$$pat"; \
+	echo "Latest release: $$latest  ->  next ($(BUMP)): $$next"; \
+	$(MAKE) --no-print-directory tag VERSION=$$next
+
+.PHONY: tag-patch
+tag-patch: ## Bump patch (v1.2.3 -> v1.2.4), tag and push  [DRY_RUN=1 to preview, YES=1 to skip the prompt]
+	@$(MAKE) --no-print-directory _bump BUMP=patch
+
+.PHONY: tag-minor
+tag-minor: ## Bump minor (v1.2.3 -> v1.3.0), tag and push
+	@$(MAKE) --no-print-directory _bump BUMP=minor
+
+.PHONY: tag-major
+tag-major: ## Bump major (v1.2.3 -> v2.0.0), tag and push
+	@$(MAKE) --no-print-directory _bump BUMP=major
 
 .PHONY: release
 release: _require-version _require-clean ## Build archives, push the tag, create a GitHub release (needs gh)
