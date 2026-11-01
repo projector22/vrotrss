@@ -1,1 +1,7 @@
-vrot
+/vrot
+/dist/
+/coverage.out
+/coverage.html
+/sandbox.mod
+/sandbox.sum
+*.test
