@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"os/exec"
@@ -97,16 +98,15 @@ func OpenBrowser(raw string) error {
 	if !validWebURL(raw) {
 		return fmt.Errorf("refusing to open %q: not an http(s) URL", raw)
 	}
-	var cmd *exec.Cmd
-	// raw is validated above to be an http(s) URL, so it cannot be parsed as a flag.
+	name, args := "xdg-open", []string{raw}
 	switch runtime.GOOS {
 	case "darwin":
-		cmd = exec.Command("open", raw)
+		name = "open"
 	case "windows":
-		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", raw)
-	default:
-		cmd = exec.Command("xdg-open", raw)
+		name, args = "rundll32", []string{"url.dll,FileProtocolHandler", raw}
 	}
+	// raw was validated above to be an http(s) URL, so it cannot be parsed as a flag.
+	cmd := exec.CommandContext(context.Background(), name, args...) //nolint:gosec // validated http(s) URL
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("open browser: %w", err)
 	}

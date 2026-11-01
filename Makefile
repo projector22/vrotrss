@@ -9,7 +9,7 @@ DIST     := dist
 GOBIN    := $(shell go env GOPATH)/bin
 
 # Pinned tool versions (override on the command line if needed).
-GOLANGCI_LINT_VERSION ?= v2.1.6
+GOLANGCI_LINT_VERSION ?= v2.15.0
 GOVULNCHECK_VERSION   ?= latest
 
 # ---- versioning ------------------------------------------------------------
