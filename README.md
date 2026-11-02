@@ -8,17 +8,6 @@ shows up in the browser and vice versa.
 
 ![Example](img/home-tui.png)
 
-```
- vrotrss  │  Main stream (51)                                              unread only
- ≡ Main stream          51 │● ★ Gopher Gazette   Why your goroutines are leaking   14:26
- ★ Favourites              │●   Hacker Digest    A gentle introduction to …        13:33
- ▾ Comics               11 │●   Kernel Notes     Benchmarking the new scheduler    12:40
-     Daily Strip         6 │●   Local Ledger     Notes from the kernel mailing …   10:54
-     Odds and Ends       5 │●   Space Weekly     The case for boring technology    10:01
- ▾ Tech                 18 │      …
- j/k move · enter read · m read/unread · s star · A all read · u unread/all · ? help
-```
-
 ## Try it without a server
 
 ```sh
