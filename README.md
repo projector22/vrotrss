@@ -6,6 +6,8 @@ left sidebar, articles on the right) and stays in sync with it: read, unread and
 favourite state is stored on your FreshRSS server, so what you do in the terminal
 shows up in the browser and vice versa.
 
+![Example](img/home-tui.png)
+
 ```
  vrotrss  │  Main stream (51)                                              unread only
  ≡ Main stream          51 │● ★ Gopher Gazette   Why your goroutines are leaking   14:26
