@@ -12,10 +12,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/vrotrss/vrotrss/internal/config"
-	"github.com/vrotrss/vrotrss/internal/demo"
-	"github.com/vrotrss/vrotrss/internal/greader"
-	"github.com/vrotrss/vrotrss/internal/tui"
+	"github.com/projector22/vrotrss/internal/config"
+	"github.com/projector22/vrotrss/internal/demo"
+	"github.com/projector22/vrotrss/internal/greader"
+	"github.com/projector22/vrotrss/internal/tui"
 )
 
 // Set at build time via -ldflags.

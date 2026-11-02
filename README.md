@@ -80,7 +80,7 @@ stripped before anything is drawn, and only `http(s)` links can be opened.
 ## Install
 
 ```sh
-go install github.com/vrotrss/vrotrss/cmd/vrot@latest   # from source (needs Go 1.25+)
+go install github.com/projector22/vrotrss/cmd/vrot@latest   # from source (needs Go 1.26.10+; newer toolchains are fetched automatically)
 ```
 
 or download an archive from the Releases page. A container image is available

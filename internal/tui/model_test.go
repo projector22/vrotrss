@@ -11,8 +11,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/x/ansi"
 
-	"github.com/vrotrss/vrotrss/internal/demo"
-	"github.com/vrotrss/vrotrss/internal/greader"
+	"github.com/projector22/vrotrss/internal/demo"
+	"github.com/projector22/vrotrss/internal/greader"
 )
 
 var testNow = time.Date(2026, 11, 1, 14, 30, 0, 0, time.UTC)
