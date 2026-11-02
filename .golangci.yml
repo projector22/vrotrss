@@ -46,4 +46,4 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/vrotrss/vrotrss
+        - github.com/projector22/vrotrss

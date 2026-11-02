@@ -13,7 +13,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/vrotrss/vrotrss/internal/greader"
+	"github.com/projector22/vrotrss/internal/greader"
 )
 
 const (

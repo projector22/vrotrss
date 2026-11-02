@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vrotrss/vrotrss/internal/greader"
+	"github.com/projector22/vrotrss/internal/greader"
 )
 
 const (

@@ -6,8 +6,8 @@ import (
 
 	"github.com/charmbracelet/x/ansi"
 
-	"github.com/vrotrss/vrotrss/internal/greader"
-	"github.com/vrotrss/vrotrss/internal/render"
+	"github.com/projector22/vrotrss/internal/greader"
+	"github.com/projector22/vrotrss/internal/render"
 )
 
 const (
