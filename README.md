@@ -143,4 +143,4 @@ order. Reading, read/unread, favourites and mark-all-read are complete.
 
 ## License
 
-MIT
+AGPL-3.0
