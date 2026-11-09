@@ -1,7 +1,7 @@
 # Build:  docker build -t vrotrss .
 # Run:    docker run -it --rm -e VROT_URL=https://rss.example.com \
 #             -e VROT_USERNAME=alice -e VROT_PASSWORD=api-password vrotrss
-FROM golang:1.26.10-alpine AS build
+FROM golang:1.27.3-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
